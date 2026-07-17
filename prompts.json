@@ -1,0 +1,125 @@
+[
+  {
+    "name": "port",
+    "type": "input",
+    "options": {
+      "message": "请输入默认端口号",
+      "default": 8040,
+      "required": true
+    }
+  },
+  {
+    "name": "includeTenantAdmin",
+    "type": "confirm",
+    "options": {
+      "message": "是否包含 Tenant Admin 端？",
+      "default": true
+    }
+  },
+  {
+    "name": "tenantAdminLayout",
+    "type": "select",
+    "when": {
+      "name": "includeTenantAdmin",
+      "equals": true
+    },
+    "options": {
+      "message": "Tenant Admin 使用哪种布局？",
+      "choices": [
+        {
+          "name": "components-core:Layout",
+          "value": "layout"
+        },
+        {
+          "name": "@kne/system-layout",
+          "value": "system-layout"
+        }
+      ],
+      "default": "system-layout"
+    }
+  },
+  {
+    "name": "includeTenantClient",
+    "type": "confirm",
+    "options": {
+      "message": "是否包含 Tenant Client 端？",
+      "default": false
+    }
+  },
+  {
+    "name": "tenantClientLayout",
+    "type": "select",
+    "when": {
+      "name": "includeTenantClient",
+      "equals": true
+    },
+    "options": {
+      "message": "Tenant Client 使用哪种布局？",
+      "choices": [
+        {
+          "name": "components-core:Layout",
+          "value": "layout"
+        },
+        {
+          "name": "@kne/system-layout",
+          "value": "system-layout"
+        }
+      ],
+      "default": "system-layout"
+    }
+  },
+  {
+    "name": "includeClient",
+    "type": "confirm",
+    "options": {
+      "message": "是否包含不带租户的 Client 端？",
+      "default": false
+    }
+  },
+  {
+    "name": "clientLayout",
+    "type": "select",
+    "when": {
+      "name": "includeClient",
+      "equals": true
+    },
+    "options": {
+      "message": "Client 使用哪种布局？",
+      "choices": [
+        {
+          "name": "components-core:Layout",
+          "value": "layout"
+        },
+        {
+          "name": "@kne/system-layout",
+          "value": "system-layout"
+        }
+      ],
+      "default": "system-layout"
+    }
+  },
+  {
+    "name": "includeOss",
+    "type": "confirm",
+    "options": {
+      "message": "是否需要 OSS 支持？",
+      "default": false
+    }
+  },
+  {
+    "name": "includeDingtalk",
+    "type": "confirm",
+    "options": {
+      "message": "是否需要钉钉支持？",
+      "default": false
+    }
+  },
+  {
+    "name": "includeWecom",
+    "type": "confirm",
+    "options": {
+      "message": "是否需要企业微信支持？",
+      "default": false
+    }
+  }
+]

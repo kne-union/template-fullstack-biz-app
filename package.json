@@ -1,0 +1,20 @@
+{
+  "name": "@kne-template/fullstack-biz-app",
+  "version": "0.1.0",
+  "description": "全栈 BizUnit 业务项目模版，支持可选 Tenant 端与客户端",
+  "files": [
+    "prompts.json",
+    "template"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kne-union/template-fullstack-biz-app.git"
+  },
+  "keywords": [],
+  "author": "linzp",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kne-union/template-fullstack-biz-app/issues"
+  },
+  "homepage": "https://github.com/kne-union/template-fullstack-biz-app#readme"
+}

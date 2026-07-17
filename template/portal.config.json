@@ -1,0 +1,11 @@
+{
+  "includeTenantAdmin": <%=includeTenantAdmin%>,
+  "tenantAdminLayout": "<%=tenantAdminLayout%>",
+  "includeTenantClient": <%=includeTenantClient%>,
+  "tenantClientLayout": "<%=tenantClientLayout%>",
+  "includeClient": <%=includeClient%>,
+  "clientLayout": "<%=clientLayout%>",
+  "includeOss": <%=includeOss%>,
+  "includeDingtalk": <%=includeDingtalk%>,
+  "includeWecom": <%=includeWecom%>
+}
