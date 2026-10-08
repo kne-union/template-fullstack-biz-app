@@ -7,6 +7,7 @@ import '@kne/system-layout/dist/index.css';
 import { Outlet } from 'react-router-dom';
 import withLocale from './withLocale';
 import { useIntl } from '@kne/react-intl';
+import { withPublicUrl } from '../../commons/publicUrl';
 
 const Layout = createWithRemoteLoader({
   modules: [
@@ -85,7 +86,7 @@ const Layout = createWithRemoteLoader({
                           label: formatMessage({ id: 'TenantMenuSwitchTenant' }),
                           icon: <UserSwitchOutlined />,
                           onClick: () => {
-                            window.location.href = '/login-tenant';
+                            window.location.href = withPublicUrl('/login-tenant');
                           }
                         },
                         {

@@ -68,7 +68,7 @@
   },
   "devDependencies": {
     "@craco/craco": "^7.1.0",
-    "@kne/modules-dev": "^2.0.14",
+    "@kne/modules-dev": "^2.4.17",
     "@kne/react-fetch": "^1.4.3",
     "@kne/remote-loader": "^1.2.3",
     "@loadable/component": "^5.16.3",
