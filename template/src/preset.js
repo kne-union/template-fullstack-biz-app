@@ -8,6 +8,7 @@ import { getToken } from '@kne/token-storage';
 import transform from 'lodash/transform';
 import merge from 'lodash/merge';
 import { getApis } from '@components/Apis';
+import { withPublicUrl } from './commons/publicUrl';
 
 window.PUBLIC_URL = window.runtimePublicUrl || process.env.PUBLIC_URL;
 
@@ -28,7 +29,7 @@ export const globalInit = async () => {
           const searchParams = new URLSearchParams(window.location.search);
           const referer = encodeURIComponent(window.location.pathname + window.location.search);
           searchParams.append('referer', referer);
-          window.location.href = '/account/login?' + searchParams.toString();
+          window.location.href = `${withPublicUrl('/account/login')}?${searchParams.toString()}`;
           response.showError = false;
         }
         return response;
@@ -90,12 +91,12 @@ export const globalInit = async () => {
       'components-admin': {
         ...registry,
         remote: 'components-admin',
-        defaultVersion: '1.1.19'
+        defaultVersion: '1.1.114'
       },
       'components-thirdparty': {
         ...registry,
         remote: 'components-thirdparty',
-        defaultVersion: '0.1.6'
+        defaultVersion: '0.1.50'
       },
       'fastify-app':
         process.env.NODE_ENV === 'development'

@@ -61,6 +61,22 @@ npm run build
 
 构建产物位于 `build/` 目录，由后端静态文件服务托管。
 
+### 作为 App Manager 子应用部署
+
+生成的项目可直接作为 [`@kne/fastify-app-manager`](https://github.com/kne-union/fastify-app-manager) 的子应用上传部署（挂载在 `/app/{应用标识}/` 或绑定域名），无需额外改造：
+
+| 要求 | 模版中的处理 |
+|---|---|
+| 路径前缀 | `src/commons/publicUrl.js` 读取部署时注入的 `window.runtimePublicUrl`；`BrowserRouter` 以其作 `basename`，401 跳登录、切换租户等整页跳转用 `withPublicUrl` 补前缀；接口请求以 `window.runtimeApiUrl` 为 `baseURL` |
+| 存储隔离 | `@kne/modules-dev ^2.4.17` 与 remote（components-admin ≥1.1.114、components-thirdparty ≥0.1.50）共享 `@kne/local-storage` 单例，登录 token 按注入的 `window.__LOCAL_STORAGE_PREFIX` 隔离 |
+| 共享库表前缀 | `@kne/fastify-sequelize ^4.0.5` 读取注入的 `DB_TABLE_PREFIX`（`t_{应用标识}_`）强制表名前缀 |
+| 数据库 | 支持 `DB_PORT`；内置 `pg` 驱动以连接 postgres 共享库（mysql 需自行加 `mysql2`） |
+| 端口 | 服务端监听环境变量 `PORT` |
+
+打包：`npm run build` 后将 `package.json`、`build/`、`server/`（不含 `node_modules`、`.env`、本地数据库文件）压缩为 zip 上传。独立部署时上述注入变量为空，行为与普通部署一致。
+
+> 重置密码邮件链接使用 `ORIGIN`，以路径模式挂载时应配置为含前缀的地址，如 `https://example.com/app/{应用标识}`。
+
 ## 项目结构
 
 ```
