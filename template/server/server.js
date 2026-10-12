@@ -33,29 +33,7 @@ const syncOrgType = [<% if (includeWecom) { %>'wecom:企业微信'<% } %><% if (
 const createServer = () => {
   fastify.register(fastifyEnv, {
     dotenv: true,
-    schema: {
-      type: 'object',
-      properties: {
-        DB_DIALECT: { type: 'string', default: 'sqlite' },
-        DB_HOST: { type: 'string', default: 'data.db' },
-        DB_PORT: { type: 'number' },
-        DB_USERNAME: { type: 'string' },
-        DB_PASSWORD: { type: 'string' },
-        DB_DATABASE: { type: 'string' },
-        ENV: { type: 'string', default: 'local' },
-        PORT: { type: 'number', default: <%=port%> },
-        ORIGIN: { type: 'string', default: '' }<% if (includeOss) { %>,
-        OSS_REGION: { type: 'string' },
-        OSS_BUCKET: { type: 'string' },
-        OSS_ACCESS_KEY_ID: { type: 'string' },
-        OSS_ACCESS_KEY_SECRET: { type: 'string' }<% } %><% if (includeTenant && (includeDingtalk || includeWecom)) { %>,
-        SYNC_ORG_SECRET: { type: 'string' },
-        SYNC_ORG_HOST: { type: 'string' }<% } %>,
-        ALISMTP_USER: { type: 'string' },
-        ALISMTP_PASSWORD: { type: 'string' },
-        ALISMTP_ENDPOINT: { type: 'string' }
-      }
-    }
+    schema: require('./env.schema.json')
   });
 
   fastify.register(require('fastify-cron'));
