@@ -129,7 +129,7 @@ my-project/
 | `tenantClientLayout` | 租户客户端布局风格 | `system-layout` |
 | `includeClient` | 是否包含普通客户端 | `false` |
 | `clientLayout` | 客户端布局风格 | `system-layout` |
-| `includeOss` | 是否启用阿里云 OSS | `false` |
+| `includeOss` | 是否启用阿里云 OSS；启用后运行时 `OSS_REGION` / `OSS_BUCKET` / `OSS_ACCESS_KEY_ID` / `OSS_ACCESS_KEY_SECRET` 都填写时上传文件存 OSS，否则存本地 `server/static` | `false` |
 | `includeDingtalk` | 是否启用钉钉集成 | `false` |
 | `includeWecom` | 是否启用企业微信集成 | `false` |
 
