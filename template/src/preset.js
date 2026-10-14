@@ -71,7 +71,7 @@ export const globalInit = async () => {
   const componentsCoreRemote = {
     ...registry,
     remote: 'components-core',
-    defaultVersion: '0.4.55'
+    defaultVersion: '0.6.13'
   };
 
   remoteLoaderPreset({
@@ -86,12 +86,12 @@ export const globalInit = async () => {
       'components-file-manager': {
         ...registry,
         remote: 'components-file-manager',
-        defaultVersion: '0.1.1'
+        defaultVersion: '0.1.9'
       },
       'components-admin': {
         ...registry,
         remote: 'components-admin',
-        defaultVersion: '1.1.114'
+        defaultVersion: '1.1.118'
       },
       'components-thirdparty': {
         ...registry,

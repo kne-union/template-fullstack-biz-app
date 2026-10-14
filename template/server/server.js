@@ -154,22 +154,27 @@ const createServer = () => {
 
   fastify.register(
     require('fastify-plugin')(async fastify => {<% if (includeOss) { %>
-      fastify.register(require('@kne/fastify-aliyun'), {
-        prefix: `${options.prefix}/aliyun`,
-        oss: {
-          baseDir: '<%=name%>',
-          region: fastify.config.OSS_REGION,
-          accessKeyId: fastify.config.OSS_ACCESS_KEY_ID,
-          accessKeySecret: fastify.config.OSS_ACCESS_KEY_SECRET,
-          bucket: fastify.config.OSS_BUCKET
-        }
-      });<% } %>
-
+      const { OSS_REGION, OSS_BUCKET, OSS_ACCESS_KEY_ID, OSS_ACCESS_KEY_SECRET } = fastify.config;
+      const ossEnabled = !!(OSS_REGION && OSS_BUCKET && OSS_ACCESS_KEY_ID && OSS_ACCESS_KEY_SECRET);
+<% } %>
       fastify.register(require('@kne/fastify-file-manager'), {
         prefix: `${options.prefix}/static`,
         root: path.resolve('./static')<% if (includeOss) { %>,
-        ossAdapter: () => fastify.aliyun.services.oss<% } %>
-      });
+        ossAdapter: () => (ossEnabled ? fastify.aliyun.services.oss : {})<% } %>
+      });<% if (includeOss) { %>
+
+      if (ossEnabled) {
+        fastify.register(require('@kne/fastify-aliyun'), {
+          prefix: `${options.prefix}/aliyun`,
+          oss: {
+            baseDir: '<%=name%>',
+            region: OSS_REGION,
+            accessKeyId: OSS_ACCESS_KEY_ID,
+            accessKeySecret: OSS_ACCESS_KEY_SECRET,
+            bucket: OSS_BUCKET
+          }
+        });
+      }<% } %>
     })
   );
 
