@@ -72,8 +72,9 @@ npm run build
 | 共享库表前缀 | `@kne/fastify-sequelize ^4.0.5` 读取注入的 `DB_TABLE_PREFIX`（`t_{应用标识}_`）强制表名前缀 |
 | 数据库 | 支持 `DB_PORT`；内置 `pg` 驱动以连接 postgres 共享库（mysql 需自行加 `mysql2`） |
 | 端口 | 服务端监听环境变量 `PORT` |
+| 环境变量声明 | `server/env.schema.json`（标准 JSON Schema，必填项放顶层 `required`，敏感值标 `writeOnly: true`）；`server.js` 通过 `@fastify/env` 加载。App Manager 部署前按它校验变量，并在环境变量管理中列出需要填写的项；缺少该文件的包会被拒绝 |
 
-打包：`npm run build` 后将 `package.json`、`build/`、`server/`（不含 `node_modules`、`.env`、本地数据库文件）压缩为 zip 上传。独立部署时上述注入变量为空，行为与普通部署一致。
+打包：`npm run build` 后执行 `npx @kne/npm-tools packApp`，检查包结构与 `env.schema.json` 后生成 zip（只含 `package.json`、`build/`、`server/`，不含 `node_modules`、`.env`、本地数据库文件）。独立部署时上述注入变量为空，行为与普通部署一致。
 
 > 重置密码邮件链接使用 `ORIGIN`，以路径模式挂载时应配置为含前缀的地址，如 `https://example.com/app/{应用标识}`。
 
