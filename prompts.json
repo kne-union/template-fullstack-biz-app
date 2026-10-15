@@ -99,6 +99,14 @@
     }
   },
   {
+    "name": "includeOidc",
+    "type": "confirm",
+    "options": {
+      "message": "是否开启 OIDC 统一认证？",
+      "default": true
+    }
+  },
+  {
     "name": "includeOss",
     "type": "confirm",
     "options": {

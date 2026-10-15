@@ -129,6 +129,7 @@ my-project/
 | `tenantClientLayout` | 租户客户端布局风格 | `system-layout` |
 | `includeClient` | 是否包含普通客户端 | `false` |
 | `clientLayout` | 客户端布局风格 | `system-layout` |
+| `includeOidc` | 是否开启 OIDC 统一认证（`@kne/fastify-oidc`）；独立部署时项目自身作为 IdP（需配置 `ORIGIN`、`OIDC_KEY_SECRET`），部署在应用中心时自动以 central 模式接入应用中心统一登录 | `true` |
 | `includeOss` | 是否启用阿里云 OSS；启用后运行时 `OSS_REGION` / `OSS_BUCKET` / `OSS_ACCESS_KEY_ID` / `OSS_ACCESS_KEY_SECRET` 都填写时上传文件存 OSS，否则存本地 `server/static` | `false` |
 | `includeDingtalk` | 是否启用钉钉集成 | `false` |
 | `includeWecom` | 是否启用企业微信集成 | `false` |
@@ -149,6 +150,12 @@ my-project/
 - 邮箱验证码注册/登录
 - 密码重置
 - 初始化管理员
+
+### 统一认证 (`@kne/fastify-oidc`，`includeOidc` 开启时)
+
+- 前端通过 `components-admin:Oidc` 走授权码 + PKCE 登录，请求自动带 `Authorization`
+- 独立部署时作为 IdP，提供 `/oidc` 协议端点与 `/oidc-interaction` 登录页
+- 部署在应用中心时以 central 模式运行，使用应用中心统一登录
 
 ### 多租户系统 (`@kne/fastify-tenant`)
 

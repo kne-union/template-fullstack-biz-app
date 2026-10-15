@@ -58,7 +58,8 @@ const createServer = () => {
 
       fastify.register(require('@kne/fastify-account'), {
         isTest: true,
-        prefix: `${options.prefix}`,
+        prefix: `${options.prefix}`,<% if (includeOidc) { %>
+        getUserAuthenticate: () => fastify.oidc.authenticate.user,<% } %>
         sendMessage: async ({ name, type, messageType, props }) => {
           if (messageType === 1 && type === 0) {
             await fastify.message.services.sendMessage({
@@ -114,7 +115,8 @@ const createServer = () => {
 
       fastify.register(require('@kne/fastify-tenant'), {
         prefix: `${options.prefix}/tenant`,
-        getUserModel: options.getUserModel<% if (includeDingtalk || includeWecom) { %>,
+        getUserModel: options.getUserModel<% if (includeOidc) { %>,
+        onPermissionChange: payload => fastify.oidc.onPermissionChange(payload)<% } %><% if (includeDingtalk || includeWecom) { %>,
         syncOrgType: syncOrgType,
         syncOrgTask: async input => {
           const { tenantId } = input;
@@ -148,6 +150,13 @@ const createServer = () => {
             });
           }
         }<% } %>
+      });<% } %><% if (includeOidc) { %>
+
+      // .env 里的值不一定写入 process.env（@fastify/env 7 起不再写入），fastify-oidc 的环境变量默认值可能读不到，需显式传入
+      fastify.register(require('@kne/fastify-oidc'), {
+        selfClient: { clientName: '<%=name%>' },
+        origin: fastify.config.ORIGIN,
+        keyEncryptionSecret: fastify.config.OIDC_KEY_SECRET
       });<% } %>
     })
   );
