@@ -14,7 +14,7 @@
 | 构建工具 | Craco (Create React App 配置覆盖) |
 | 远程组件 | `@kne/remote-loader` |
 | 服务端框架 | Fastify 5 |
-| 数据库 | SQLite3 + Sequelize ORM |
+| 数据库 | Sequelize ORM；生产 PostgreSQL（pg），本地开发 SQLite3 |
 | 国际化 | `@kne/react-intl` |
 
 ## 核心特性
@@ -70,11 +70,11 @@ npm run build
 | 路径前缀 | `src/commons/publicUrl.js` 读取部署时注入的 `window.runtimePublicUrl`；`BrowserRouter` 以其作 `basename`，401 跳登录、切换租户等整页跳转用 `withPublicUrl` 补前缀；接口请求以 `window.runtimeApiUrl` 为 `baseURL` |
 | 存储隔离 | `@kne/modules-dev ^2.4.17` 与 remote（components-admin ≥1.1.114、components-thirdparty ≥0.1.50）共享 `@kne/local-storage` 单例，登录 token 按注入的 `window.__LOCAL_STORAGE_PREFIX` 隔离 |
 | 共享库表前缀 | `@kne/fastify-sequelize ^4.0.5` 读取注入的 `DB_TABLE_PREFIX`（`t_{应用标识}_`）强制表名前缀 |
-| 数据库 | 支持 `DB_PORT`；内置 `pg` 驱动以连接 postgres 共享库（mysql 需自行加 `mysql2`） |
+| 数据库 | 支持 `DB_PORT`；生产用 `pg` 连接 postgres（mysql 需自行加 `mysql2`）。`sqlite3` 只在 devDependencies，供本地开发默认的 `DB_DIALECT=sqlite` 使用；App Manager 以 `npm install --production` 安装，不会装它，也就不会在服务器上编译原生模块 |
 | 端口 | 服务端监听环境变量 `PORT` |
 | 环境变量声明 | `server/env.schema.json`（标准 JSON Schema，必填项放顶层 `required`，敏感值标 `writeOnly: true`）；`server.js` 通过 `@fastify/env` 加载。App Manager 部署前按它校验变量，并在环境变量管理中列出需要填写的项；缺少该文件的包会被拒绝 |
 
-打包：`npm run build` 后执行 `npx @kne/npm-tools packApp`，检查包结构与 `env.schema.json` 后生成 zip（只含 `package.json`、`build/`、`server/`，不含 `node_modules`、`.env`、本地数据库文件）。独立部署时上述注入变量为空，行为与普通部署一致。
+打包：`npm run build` 后执行 `npx @kne/npm-tools packApp`，检查包结构与 `env.schema.json` 后生成 zip（只含 `package.json`、`build/`、`server/`，不含 `node_modules`、`.env`、本地数据库文件）。独立部署时上述注入变量为空，行为与普通部署一致；生产环境须配置 `DB_DIALECT=postgres` 及连接参数。
 
 > 重置密码邮件链接使用 `ORIGIN`，以路径模式挂载时应配置为含前缀的地址，如 `https://example.com/app/{应用标识}`。
 
