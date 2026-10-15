@@ -12,7 +12,7 @@ const removeDir = target => {
 
 const run = () => {
   const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-  const { includeTenantAdmin, includeTenantClient, includeClient, includeDingtalk, includeWecom } = config;
+  const { includeTenantAdmin, includeTenantClient, includeClient, includeDingtalk, includeWecom, includeOidc } = config;
   const componentsDir = path.resolve(projectRoot, 'src/components');
   const serverDir = path.resolve(projectRoot, 'server');
 
@@ -31,6 +31,10 @@ const run = () => {
   if (!((includeTenantAdmin || includeTenantClient) && (includeDingtalk || includeWecom))) {
     removeDir(path.resolve(serverDir, 'libs/tasks'));
     removeDir(path.resolve(serverDir, 'libs/utils'));
+  }
+
+  if (includeOidc === false) {
+    removeDir(path.resolve(projectRoot, 'src/commons/oidcClient.js'));
   }
 };
 

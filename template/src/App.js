@@ -1,4 +1,5 @@
-import RemoteLoader, { createWithRemoteLoader } from '@kne/remote-loader';
+<% if (includeOidc) { %>import { useEffect } from 'react';
+<% } %>import RemoteLoader, { createWithRemoteLoader } from '@kne/remote-loader';
 import AppChildrenRouter from '@kne/app-children-router';
 import { Navigate } from 'react-router-dom';
 import Admin from '@components/Admin';
@@ -11,14 +12,28 @@ import TenantClient from '@components/TenantClient';
 <% if (includeClient) { %>
 import Client from '@components/Client';
 <% } %>
-import './index.scss';
+<% if (includeOidc) { %>import { getOidcClient } from './commons/oidcClient';
+<% } %>import './index.scss';
+<% if (includeOidc) { %>
+const Protected = ({ children }) => <RemoteLoader module="components-admin:Oidc@OidcAuthenticate">{children}</RemoteLoader>;
 
+/** 远程组件内置的退出（useLogout）会跳到 /account/login，统一转为 OIDC 退出 */
+const AccountLoginRedirect = () => {
+  useEffect(() => {
+    getOidcClient().logout();
+  }, []);
+  return null;
+};
+<% } else { %>
+const Protected = ({ children }) => children;
+<% } %>
 const App = createWithRemoteLoader({
   modules: ['components-core:Global', 'components-admin:Authenticate@AfterUserLoginLayout', 'components-admin:Authenticate@AfterAdminUserLoginLayout']
 })(({ remoteModules, globalPreset }) => {
   const [Global, AfterUserLoginLayout, AfterAdminUserLoginLayout] = remoteModules;
   const baseUrl = '';
-  const systemName = '<%=name%>';
+  const systemName = '<%=name%>';<% if (includeOidc) { %>
+  const isOidcClient = globalPreset.oidcMode === 'central';<% } %>
 
   const adminNavigation = {
     base: `${baseUrl}/admin`,
@@ -54,16 +69,36 @@ const App = createWithRemoteLoader({
         key: 'intl-admin',
         title: '国际化',
         path: `${baseUrl}/admin/intl-admin`
-      },
+      },<% if (includeOidc) { %>
+      !isOidcClient && {
+        key: 'oidc',
+        title: '统一认证',
+        path: `${baseUrl}/admin/oidc`
+      },<% } %>
       {
         key: 'message',
         title: '消息管理',
         path: `${baseUrl}/admin/message`
       }
-    ]
+    ].filter(Boolean)
   };
 
-  const routes = [
+  const routes = [<% if (includeOidc) { %>
+    {
+      path: 'oidc-interaction',
+      title: 'Login',
+      element: <RemoteLoader module="components-admin:Oidc@Interaction" systemName={systemName} registerUrl={`${baseUrl}/account/register`} forgetUrl={`${baseUrl}/account/forget`} />
+    },
+    {
+      path: 'oidc-callback',
+      title: 'Login',
+      element: <RemoteLoader module="components-admin:Oidc@Callback" systemName={systemName} />
+    },
+    {
+      path: 'account/login',
+      title: 'Login',
+      element: <AccountLoginRedirect />
+    },<% } %>
     {
       path: 'account/*',
       title: 'Account',
@@ -73,62 +108,71 @@ const App = createWithRemoteLoader({
       path: 'admin/initAdmin',
       title: 'Init Admin',
       element: (
-        <AppChildrenRouter
-          element={<AfterUserLoginLayout />}
-          list={[
-            {
-              index: true,
-              element: <RemoteLoader module="components-admin:Admin@InitAdmin" />
-            }
-          ]}
-        />
+        <Protected>
+          <AppChildrenRouter
+            element={<AfterUserLoginLayout />}
+            list={[
+              {
+                index: true,
+                element: <RemoteLoader module="components-admin:Admin@InitAdmin" />
+              }
+            ]}
+          />
+        </Protected>
       )
     },
     {
       path: 'admin/*',
       title: 'Admin',
       element: (
-        <AppChildrenRouter
-          errorPage
-          notFoundPage
-          baseUrl={baseUrl + '/admin'}
-          element={<AfterAdminUserLoginLayout navigation={adminNavigation} />}
-          list={[
-            {
-              index: true,
-              element: <Navigate to={`${baseUrl}/admin/sample`} replace />
-            },
-            {
-              path: 'tenant/*',
-              title: '租户管理',
-              element: <RemoteLoader module="components-admin:TenantAdmin" baseUrl={baseUrl + '/admin'} />
-            },
-            {
-              path: 'task/*',
-              title: '任务管理',
-              element: <RemoteLoader module="components-admin:Task" baseUrl={baseUrl + '/admin'} />
-            },
-            {
-              path: 'file',
-              title: '文件管理',
-              element: <RemoteLoader module="components-file-manager:FileListPage" />
-            },
-            {
-              path: 'intl-admin/*',
-              title: '国际化',
-              element: <RemoteLoader module="components-admin:IntlAdmin" baseUrl={baseUrl + '/admin/intl-admin'} />
-            },
-            {
-              path: 'message/*',
-              title: '消息管理',
-              element: <RemoteLoader module="components-admin:MessageManger" baseUrl={`${baseUrl}/admin/message`} />
-            }
-          ]}
-        >
-          <Admin baseUrl={baseUrl + '/admin'}>
-            <RemoteLoader module="components-admin:Admin" baseUrl={baseUrl + '/admin'} />
-          </Admin>
-        </AppChildrenRouter>
+        <Protected>
+          <AppChildrenRouter
+            errorPage
+            notFoundPage
+            baseUrl={baseUrl + '/admin'}
+            element={<AfterAdminUserLoginLayout navigation={adminNavigation} />}
+            list={[
+              {
+                index: true,
+                element: <Navigate to={`${baseUrl}/admin/sample`} replace />
+              },
+              {
+                path: 'tenant/*',
+                title: '租户管理',
+                element: <RemoteLoader module="components-admin:TenantAdmin" baseUrl={baseUrl + '/admin'} />
+              },
+              {
+                path: 'task/*',
+                title: '任务管理',
+                element: <RemoteLoader module="components-admin:Task" baseUrl={baseUrl + '/admin'} />
+              },
+              {
+                path: 'file',
+                title: '文件管理',
+                element: <RemoteLoader module="components-file-manager:FileListPage" />
+              },
+              {
+                path: 'intl-admin/*',
+                title: '国际化',
+                element: <RemoteLoader module="components-admin:IntlAdmin" baseUrl={baseUrl + '/admin/intl-admin'} />
+              },<% if (includeOidc) { %>
+              !isOidcClient && {
+                path: 'oidc/*',
+                title: '统一认证',
+                element: <RemoteLoader module="components-admin:OidcAdmin" baseUrl={`${baseUrl}/admin/oidc`} />
+              },<% } %>
+              {
+                path: 'message/*',
+                title: '消息管理',
+                element: <RemoteLoader module="components-admin:MessageManger" baseUrl={`${baseUrl}/admin/message`} />
+              }
+            ].filter(Boolean)}
+          >
+            <Admin baseUrl={baseUrl + '/admin'}>
+              <RemoteLoader module="components-admin:Admin" baseUrl={baseUrl + '/admin'} />
+            </Admin>
+          </AppChildrenRouter>
+        </Protected>
       )
     }
   ];
@@ -151,21 +195,25 @@ const App = createWithRemoteLoader({
     path: 'join-tenant',
     title: 'Join Tenant',
     element: (
-      <AfterUserLoginLayout>
-        <RemoteLoader module="components-admin:Tenant@JoinInvitation" />
-      </AfterUserLoginLayout>
+      <Protected>
+        <AfterUserLoginLayout>
+          <RemoteLoader module="components-admin:Tenant@JoinInvitation" />
+        </AfterUserLoginLayout>
+      </Protected>
     )
   });
   routes.push({
     path: 'login-tenant',
     title: 'Login Tenant',
     element: (
-      <AfterUserLoginLayout>
-        <RemoteLoader
-          module="components-admin:Tenant@LoginTenant"
-          tenantPath={`${baseUrl}<% if (includeTenantClient) { %>/tenant<% } else { %>/tenant-admin<% } %>`}
-        />
-      </AfterUserLoginLayout>
+      <Protected>
+        <AfterUserLoginLayout>
+          <RemoteLoader
+            module="components-admin:Tenant@LoginTenant"
+            tenantPath={`${baseUrl}<% if (includeTenantClient) { %>/tenant<% } else { %>/tenant-admin<% } %>`}
+          />
+        </AfterUserLoginLayout>
+      </Protected>
     )
   });
 <% } %>
@@ -173,14 +221,22 @@ const App = createWithRemoteLoader({
 <% if (includeTenantAdmin) { %>
   routes.push({
     path: 'tenant-admin/*',
-    element: <TenantAdmin baseUrl={`${baseUrl}/tenant-admin`} />
+    element: (
+      <Protected>
+        <TenantAdmin baseUrl={`${baseUrl}/tenant-admin`} />
+      </Protected>
+    )
   });
 <% } %>
 
 <% if (includeTenantClient) { %>
   routes.push({
     path: 'tenant/*',
-    element: <TenantClient baseUrl={`${baseUrl}/tenant`} />
+    element: (
+      <Protected>
+        <TenantClient baseUrl={`${baseUrl}/tenant`} />
+      </Protected>
+    )
   });
 <% } %>
 
