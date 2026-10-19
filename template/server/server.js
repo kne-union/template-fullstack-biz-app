@@ -154,7 +154,7 @@ const createServer = () => {
 
       // .env 里的值不一定写入 process.env（@fastify/env 7 起不再写入），fastify-oidc 的环境变量默认值可能读不到，需显式传入
       fastify.register(require('@kne/fastify-oidc'), {
-        selfClient: { clientName: '<%=name%>' },
+        selfClient: { clientName: '<%= name.charAt(0).toUpperCase() + name.slice(1) %>' },
         origin: fastify.config.ORIGIN,
         keyEncryptionSecret: fastify.config.OIDC_KEY_SECRET
       });<% } %>
