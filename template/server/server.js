@@ -7,6 +7,7 @@ const fastify = require('fastify')({
 const fastifyEnv = require('@fastify/env');
 const packageJson = require('./package.json');
 const path = require('path');
+const fs = require('fs');
 
 const version = `v${packageJson.version.split('.')[0]}`;
 
@@ -203,35 +204,18 @@ const createServer = () => {
           ['services', path.resolve(__dirname, './libs/services')]
         ]
       });
-      await fastify.sequelize.sync();
-    })
-  );
-
-  fastify.register(
-    require('fastify-plugin')(async fastify => {
-      const getEntry = () => {
-        const env = fastify.config.ENV;
-        if (env === 'staging') {
-          return 'entry.html';
-        }
-
-        if (env === 'prod') {
-          return 'entry-prod.html';
-        }
-
-        return 'index.html';
-      };
-      fastify.register(require('@fastify/static'), {
+      // 内含 @kne/fastify-setting，须在 sync 之前注册
+      await fastify.register(require('@kne/fastify-app-runtime'), {
         root: path.join(__dirname, './build'),
-        prefix: '/',
-        decorateReply: false,
-        index: getEntry()
-      });
-      fastify.setNotFoundHandler((req, reply) => {
-        if (req.method === 'GET') {
-          reply.sendFile(getEntry(), { root: path.join(__dirname, './build') });
+        packageJson: fs.existsSync(path.join(__dirname, '../package.json')) ? require('../package.json') : packageJson,
+        setting: {
+          prefix: `${options.prefix}/setting`
+        },
+        static: {
+          manifestFiles: ['manifest.json']
         }
       });
+      await fastify.sequelize.sync();
     })
   );
 
