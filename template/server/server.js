@@ -37,6 +37,13 @@ const createServer = () => {
     schema: require('./env.schema.json')
   });
 
+  // 须在其它插件之前注册，否则收集不到先定义的路由；文档由 @kne/fastify-app-runtime 的 /open-api.json 输出
+  fastify.register(require('@fastify/swagger'), {
+    openapi: {
+      info: { title: '<%=name%>', version: packageJson.version }
+    }
+  });
+
   fastify.register(require('fastify-cron'));
 
   fastify.register(
@@ -58,7 +65,7 @@ const createServer = () => {
       });
 
       fastify.register(require('@kne/fastify-account'), {
-        isTest: true,
+        isTest: fastify.config.IS_TEST,
         prefix: `${options.prefix}`,<% if (includeOidc) { %>
         getUserAuthenticate: () => fastify.oidc.authenticate.user,<% } %>
         sendMessage: async ({ name, type, messageType, props }) => {
@@ -90,6 +97,7 @@ const createServer = () => {
       });
 
       fastify.register(require('@kne/fastify-message'), {
+        isTest: fastify.config.IS_TEST,
         prefix: `${options.prefix}/message`,
         emailConfig: {
           host: fastify.config.ALISMTP_ENDPOINT,

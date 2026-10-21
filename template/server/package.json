@@ -39,13 +39,14 @@
   "dependencies": {
     "@fastify/env": "^5.0.3",
     "@fastify/static": "^8.3.0",
+    "@fastify/swagger": "^9.9.2",
     "@kne/fastify-account": "^2.0.10",
     "@kne/fastify-aliyun": "^1.1.7",
     "@kne/fastify-app-runtime": "^0.1.4",
     "@kne/fastify-file-manager": "^3.0.8",
     "@kne/fastify-message": "^1.0.13",
     "@kne/fastify-namespace": "^1.2.1",<% if (includeOidc) { %>
-    "@kne/fastify-oidc": "^0.1.6",<% } %>
+    "@kne/fastify-oidc": "^0.1.7",<% } %>
     "@kne/fastify-response-data-format": "^1.0.0",
     "@kne/fastify-sequelize": "^4.0.5",
     "@kne/fastify-task": "^2.0.7",
@@ -56,7 +57,8 @@
     "fs-extra": "^11.4.1",
     "lodash": "^4.18.1",
     "pg": "^8.23.1",
-    "qs": "^6.16.0"
+    "qs": "^6.16.0",
+    "sequelize": "^6.37.8"
   },
   "devDependencies": {
     "husky": "^9.1.7",
