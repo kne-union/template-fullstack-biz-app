@@ -7,7 +7,6 @@ import '@kne/system-layout/dist/index.css';
 import { Outlet } from 'react-router-dom';
 import withLocale from './withLocale';
 import { useIntl } from '@kne/react-intl';
-import { withPublicUrl } from '../../commons/publicUrl';
 
 const Layout = createWithRemoteLoader({
   modules: [
@@ -15,12 +14,13 @@ const Layout = createWithRemoteLoader({
     'components-admin:Account@useLogout',
     'components-core:Permissions',
     'components-core:Icon',
+    'components-admin:Oidc@appUrl',
     'components-core:Global@SetGlobal'<% if (tenantAdminLayout === 'layout') { %>,
     'components-core:Layout'<% } %>
   ]
 })(
   withLocale(({ remoteModules, baseUrl, children }) => {
-    const [Authenticate, useLogout, Permissions, Icon, SetGlobal<% if (tenantAdminLayout === 'layout') { %>, CoreLayout<% } %>] = remoteModules;
+    const [Authenticate, useLogout, Permissions, Icon, appUrl, SetGlobal<% if (tenantAdminLayout === 'layout') { %>, CoreLayout<% } %>] = remoteModules;
     const logout = useLogout();
     const { formatMessage } = useIntl();
 
@@ -86,7 +86,7 @@ const Layout = createWithRemoteLoader({
                           label: formatMessage({ id: 'TenantMenuSwitchTenant' }),
                           icon: <UserSwitchOutlined />,
                           onClick: () => {
-                            window.location.href = withPublicUrl('/login-tenant');
+                            window.location.href = appUrl.page('/login-tenant');
                           }
                         },
                         {

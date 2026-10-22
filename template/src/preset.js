@@ -9,19 +9,8 @@ import createAjax from '@kne/axios-fetch';
 import merge from 'lodash/merge';
 import { getApis } from '@components/Apis';
 <% if (includeOidc) { %>import { setOidcClient } from './commons/oidcClient';
-<% } else { %>import { withPublicUrl } from './commons/publicUrl';
 <% } %>
 window.PUBLIC_URL = window.runtimePublicUrl || process.env.PUBLIC_URL;
-
-const publicBase = String(window.PUBLIC_URL || '').replace(/\/+$/, '');
-if (publicBase && typeof document !== 'undefined') {
-  document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"], link[rel="manifest"]').forEach(link => {
-    const href = link.getAttribute('href') || '';
-    if (href.startsWith('/') && !href.startsWith(`${publicBase}/`)) {
-      link.setAttribute('href', `${publicBase}${href}`);
-    }
-  });
-}
 
 const ensureBootMask = () => {
   if (typeof document === 'undefined') {
@@ -41,7 +30,6 @@ const ensureBootMask = () => {
     const img = document.createElement('img');
     img.id = 'app-boot-logo';
     img.alt = '';
-    img.src = `${publicBase}/favicon.svg`;
     mask.appendChild(img);
     document.body.prepend(mask);
   }
@@ -56,11 +44,19 @@ const ensureBootMask = () => {
 
 ensureBootMask();
 
-const baseApiUrl = window.runtimeApiUrl || '';
+const applyStaticUrls = appUrl => {
+  document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"], link[rel="manifest"]').forEach(link => {
+    link.setAttribute('href', appUrl.asset(link.getAttribute('href') || ''));
+  });
+  const logo = document.getElementById('app-boot-logo');
+  if (logo) {
+    logo.setAttribute('src', appUrl.asset(logo.getAttribute('src') || '/favicon.svg'));
+  }
+};
 <% if (includeOidc) { %>
-const loadOidcConfig = async () => {
+const loadOidcConfig = async appUrl => {
   try {
-    const response = await fetch(`${baseApiUrl.replace(/\/+$/, '')}/api/oidc/config`);
+    const response = await fetch(appUrl.api('/api/oidc/config'));
     const body = await response.json();
     return body && Object.prototype.hasOwnProperty.call(body, 'code') && Object.prototype.hasOwnProperty.call(body, 'data') ? body.data : body;
   } catch (e) {
@@ -98,7 +94,7 @@ const globalInit = async () => {
       'components-admin': {
         ...registry,
         remote: 'components-admin',
-        defaultVersion: '1.1.118'
+        defaultVersion: '1.1.129'
       },
       'components-thirdparty': {
         ...registry,
@@ -119,10 +115,14 @@ const globalInit = async () => {
             }
     }
   });
+
+  const { default: appUrl } = await loadModule('components-admin:Oidc@appUrl');
+  applyStaticUrls(appUrl);
+  const baseApiUrl = appUrl.apiBase();
 <% if (includeOidc) { %>
   const { default: createOidcClient } = await loadModule('components-admin:Oidc@createOidcClient');
   // 部署在应用中心时以 central 模式运行，issuer / clientId / audience 由宿主注入到服务端环境变量，只能从服务端配置接口读取
-  const oidcConfig = await loadOidcConfig();
+  const oidcConfig = await loadOidcConfig(appUrl);
   const oidcClient = createOidcClient({
     issuer: oidcConfig?.issuer || window.runtimeOidcIssuer || `${window.location.origin}/oidc`,
     clientId: oidcConfig?.clientId || window.runtimeOidcClientId || 'oidc-spa',
@@ -150,7 +150,7 @@ const globalInit = async () => {
           const searchParams = new URLSearchParams(window.location.search);
           const referer = encodeURIComponent(window.location.pathname + window.location.search);
           searchParams.append('referer', referer);
-          window.location.href = `${withPublicUrl('/account/login')}?${searchParams.toString()}`;
+          window.location.href = `${appUrl.page('/account/login')}?${searchParams.toString()}`;
           response.showError = false;
         }
         return response;
@@ -241,6 +241,7 @@ const globalInit = async () => {
     ajax,<% if (includeOidc) { %>
     oidc: oidcClient,
     oidcMode: oidcConfig?.mode,<% } %>
+    appUrl,
     staticUrl: baseApiUrl,
     enums: Object.assign({}, await safeLoadApis('components-admin:Task@enums'), await safeLoadApis('components-admin:MessageManger@enums')),
     apis: Object.assign(
