@@ -67,7 +67,7 @@ npm run build
 
 | 要求 | 模版中的处理 |
 |---|---|
-| 路径前缀 | `src/commons/publicUrl.js` 读取部署时注入的 `window.runtimePublicUrl`；`BrowserRouter` 以其作 `basename`，401 跳登录、切换租户等整页跳转用 `withPublicUrl` 补前缀；接口请求以 `window.runtimeApiUrl` 为 `baseURL` |
+| 路径前缀 | 统一使用 `components-admin:Oidc@appUrl`（preset 中加载并放入 `globalPreset.appUrl`）：`BrowserRouter` 的 `basename` 用 `appUrl.routerBasename()`，401 跳登录、切换租户等整页跳转用 `appUrl.page()`，favicon / manifest / 启动图用 `appUrl.asset()`，接口 `baseURL` 用 `appUrl.apiBase()`；不要在项目内再写 publicUrl 工具 |
 | 存储隔离 | `@kne/modules-dev ^2.4.17` 与 remote（components-admin ≥1.1.114、components-thirdparty ≥0.1.50）共享 `@kne/local-storage` 单例，登录 token 按注入的 `window.__LOCAL_STORAGE_PREFIX` 隔离 |
 | 共享库表前缀 | `@kne/fastify-sequelize ^4.0.5` 读取注入的 `DB_TABLE_PREFIX`（`t_{应用标识}_`）强制表名前缀 |
 | 数据库 | 支持 `DB_PORT`；生产用 `pg` 连接 postgres（mysql 需自行加 `mysql2`）。`sqlite3` 只在 devDependencies，供本地开发默认的 `DB_DIALECT=sqlite` 使用；App Manager 以 `npm install --production` 安装，不会装它，也就不会在服务器上编译原生模块 |
