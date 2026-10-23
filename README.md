@@ -156,12 +156,19 @@ my-project/
 - 前端通过 `components-admin:Oidc` 走授权码 + PKCE 登录，请求自动带 `Authorization`
 - 独立部署时作为 IdP，提供 `/oidc` 协议端点与 `/oidc-interaction` 登录页
 - 部署在应用中心时以 central 模式运行，使用应用中心统一登录
+- 含租户端时以 independent 模式接入：宿主租户、成员、Logo 与头像同步到本地 fastify-tenant（托管租户只读），本地文件丢失时自动重新拷贝
 
 ### 多租户系统 (`@kne/fastify-tenant`)
 
 - 租户创建与管理
 - 组织架构管理
 - RBAC 角色权限
+- 应用系统权限写在 `server/libs/permissions.js`（经 `permissionsProfile` 合并进权限树）；部署到应用中心后注册给宿主，需在宿主为租户开通后才生效，租户管理员默认拥有已开通的全部权限
+
+### 接口文档
+
+- `@fastify/swagger` 在 server 最先注册，由 `@kne/fastify-app-runtime` 输出 `/open-api.json`；路由 schema 写 `tags`、`summary` 与字段 `description`
+- 写 `response` schema 时对象须保留 `additionalProperties: true`、可空字段类型带 `null`，否则序列化会丢字段或把 `null` 变成空串
 
 ### 任务调度 (`@kne/fastify-task`)
 

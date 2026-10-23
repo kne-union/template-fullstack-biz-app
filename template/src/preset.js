@@ -74,7 +74,7 @@ const globalInit = async () => {
   const componentsCoreRemote = {
     ...registry,
     remote: 'components-core',
-    defaultVersion: '0.6.13'
+    defaultVersion: '0.6.15'
   };
 
   remoteLoaderPreset({
@@ -94,12 +94,12 @@ const globalInit = async () => {
       'components-admin': {
         ...registry,
         remote: 'components-admin',
-        defaultVersion: '1.1.129'
+        defaultVersion: '1.1.132'
       },
       'components-thirdparty': {
         ...registry,
         remote: 'components-thirdparty',
-        defaultVersion: '0.1.50'
+        defaultVersion: '0.1.55'
       },
       'fastify-app':
         process.env.NODE_ENV === 'development'

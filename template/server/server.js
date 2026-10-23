@@ -10,6 +10,8 @@ const path = require('path');
 const fs = require('fs');
 
 const version = `v${packageJson.version.split('.')[0]}`;
+// 部署包里根目录 package.json 才是应用版本；server 单独运行（如 Docker 镜像）时回退 server/package.json
+const appPackageJson = fs.existsSync(path.join(__dirname, '../package.json')) ? require('../package.json') : packageJson;
 
 const options = {
   name: 'project',
@@ -37,6 +39,13 @@ const createServer = () => {
     schema: require('./env.schema.json')
   });
 
+  // 须在其它插件之前注册，否则收集不到先定义的路由；文档由 @kne/fastify-app-runtime 的 /open-api.json 输出
+  fastify.register(require('@fastify/swagger'), {
+    openapi: {
+      info: { title: '<%=name%>', version: appPackageJson.version }
+    }
+  });
+
   fastify.register(require('fastify-cron'));
 
   fastify.register(
@@ -58,7 +67,7 @@ const createServer = () => {
       });
 
       fastify.register(require('@kne/fastify-account'), {
-        isTest: true,
+        isTest: fastify.config.IS_TEST,
         prefix: `${options.prefix}`,<% if (includeOidc) { %>
         getUserAuthenticate: () => fastify.oidc.authenticate.user,<% } %>
         sendMessage: async ({ name, type, messageType, props }) => {
@@ -90,6 +99,7 @@ const createServer = () => {
       });
 
       fastify.register(require('@kne/fastify-message'), {
+        isTest: fastify.config.IS_TEST,
         prefix: `${options.prefix}/message`,
         emailConfig: {
           host: fastify.config.ALISMTP_ENDPOINT,
@@ -116,7 +126,8 @@ const createServer = () => {
 
       fastify.register(require('@kne/fastify-tenant'), {
         prefix: `${options.prefix}/tenant`,
-        getUserModel: options.getUserModel<% if (includeOidc) { %>,
+        getUserModel: options.getUserModel,
+        permissionsProfile: path.resolve(__dirname, './libs/permissions.js')<% if (includeOidc) { %>,
         onPermissionChange: payload => fastify.oidc.onPermissionChange(payload)<% } %><% if (includeDingtalk || includeWecom) { %>,
         syncOrgType: syncOrgType,
         syncOrgTask: async input => {
@@ -157,7 +168,10 @@ const createServer = () => {
       fastify.register(require('@kne/fastify-oidc'), {
         selfClient: { clientName: '<%= name.charAt(0).toUpperCase() + name.slice(1) %>' },
         origin: fastify.config.ORIGIN,
-        keyEncryptionSecret: fastify.config.OIDC_KEY_SECRET
+        keyEncryptionSecret: fastify.config.OIDC_KEY_SECRET<% if (includeTenant) { %>,
+        // 部署到应用中心时宿主注入 OIDC_APP_CODE 等；带本地租户数据，以 independent 模式托管宿主同步过来的租户
+        tenant: () => fastify.tenant,
+        app: { tenantMode: 'independent' }<% } %>
       });<% } %>
     })
   );
@@ -207,7 +221,7 @@ const createServer = () => {
       // 内含 @kne/fastify-setting，须在 sync 之前注册
       await fastify.register(require('@kne/fastify-app-runtime'), {
         root: path.join(__dirname, './build'),
-        packageJson: fs.existsSync(path.join(__dirname, '../package.json')) ? require('../package.json') : packageJson,
+        packageJson: appPackageJson,
         setting: {
           prefix: `${options.prefix}/setting`
         },

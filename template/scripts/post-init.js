@@ -28,6 +28,10 @@ const run = () => {
     removeDir(path.resolve(componentsDir, 'Client'));
   }
 
+  if (!(includeTenantAdmin || includeTenantClient)) {
+    removeDir(path.resolve(serverDir, 'libs/permissions.js'));
+  }
+
   if (!((includeTenantAdmin || includeTenantClient) && (includeDingtalk || includeWecom))) {
     removeDir(path.resolve(serverDir, 'libs/tasks'));
     removeDir(path.resolve(serverDir, 'libs/utils'));
