@@ -227,6 +227,10 @@ const createServer = () => {
         },
         static: {
           manifestFiles: ['manifest.json']
+        },
+        // 接入租户端左菜单的菜单声明：编辑 server/menus.json，规范见《应用菜单集成规范》
+        menus: {
+          file: path.join(__dirname, './menus.json')
         }
       });
       await fastify.sequelize.sync();

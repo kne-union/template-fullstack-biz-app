@@ -26,6 +26,7 @@
 - **全栈一体**：前端 React + 后端 Fastify 在同一仓库，开发部署统一管理
 - **企业级功能**：内置账户系统、多租户、RBAC 权限、文件管理、消息推送、第三方登录（钉钉/企业微信）、OSS 存储、任务调度
 - **开箱即用**：提供完整的 Sample CRUD 示例模块作为开发参考
+- **接入租户端左菜单**：`server/menus.json` 声明菜单（默认为空），`src/components/ComponentPreset` 提供被应用中心嵌入时的外层预设；菜单页面组件放在 `src/components/{Name}`，在 `menus.json` 中以 `component` 引用。租户可在设置里选择该应用在「左菜单」还是「应用中心」展示
 
 ## 快速开始
 
