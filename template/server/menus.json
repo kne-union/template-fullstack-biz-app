@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "integration": "remote",
+  "remote": {
+    "name": "<%=name%>",
+    "preset": "ComponentPreset"
+  },
+  "menus": []
+}
