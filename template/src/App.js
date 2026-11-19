@@ -44,12 +44,12 @@ const App = createWithRemoteLoader({
         key: 'task',
         title: '任务管理',
         path: `${baseUrl}/admin/task`
-      },
+      },<% if (includeTenantAdmin || includeTenantClient) { %>
       {
         key: 'tenant',
         title: '租户管理',
         path: `${baseUrl}/admin/tenant`
-      },
+      },<% } %>
       {
         key: 'sample',
         title: '示例模块',
@@ -64,11 +64,6 @@ const App = createWithRemoteLoader({
         key: 'file',
         title: '文件管理',
         path: `${baseUrl}/admin/file`
-      },
-      {
-        key: 'intl-admin',
-        title: '国际化',
-        path: `${baseUrl}/admin/intl-admin`
       },<% if (includeOidc) { %>
       !isOidcClient && {
         key: 'oidc',
@@ -135,12 +130,12 @@ const App = createWithRemoteLoader({
               {
                 index: true,
                 element: <Navigate to={`${baseUrl}/admin/sample`} replace />
-              },
+              },<% if (includeTenantAdmin || includeTenantClient) { %>
               {
                 path: 'tenant/*',
                 title: '租户管理',
                 element: <RemoteLoader module="components-admin:TenantAdmin" baseUrl={baseUrl + '/admin'} />
-              },
+              },<% } %>
               {
                 path: 'task/*',
                 title: '任务管理',
@@ -150,11 +145,6 @@ const App = createWithRemoteLoader({
                 path: 'file',
                 title: '文件管理',
                 element: <RemoteLoader module="components-file-manager:FileListPage" />
-              },
-              {
-                path: 'intl-admin/*',
-                title: '国际化',
-                element: <RemoteLoader module="components-admin:IntlAdmin" baseUrl={baseUrl + '/admin/intl-admin'} />
               },<% if (includeOidc) { %>
               !isOidcClient && {
                 path: 'oidc/*',
