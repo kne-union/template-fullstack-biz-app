@@ -76,7 +76,7 @@ const createServer = () => {
               name,
               type: 0,
               code: 'REGISTERCODE',
-              props,
+              props: Object.assign({ appName: '<%=name%>' }, props),
               options: {
                 title: '注册验证码'
               }
@@ -87,7 +87,7 @@ const createServer = () => {
               name,
               type: 0,
               code: 'RESETPASSWORDCODE',
-              props: Object.assign({}, props, {
+              props: Object.assign({ appName: '<%=name%>' }, props, {
                 url: `${fastify.config.ORIGIN}/account/reset-password/${props.token}${props.options?.referer ? `?referer=${props.options?.referer}` : ''}`
               }),
               options: {
@@ -164,14 +164,30 @@ const createServer = () => {
         }<% } %>
       });<% } %><% if (includeOidc) { %>
 
-      // .env 里的值不一定写入 process.env（@fastify/env 7 起不再写入），fastify-oidc 的环境变量默认值可能读不到，需显式传入
+      // .env 里的值不一定写入 process.env（@fastify/env 7 起不再写入），fastify-oidc 的环境变量默认值可能读不到，需显式传入。
+      // 切 central 只需改 AUTH_MODE / OIDC_* 环境变量，业务代码不变。
+      // legacyToken:false = 不再兼容旧 X-User-Token，资源接口只接受 OIDC access_token（前端由 components-admin:Oidc 注入 Bearer）。
       fastify.register(require('@kne/fastify-oidc'), {
+        mode: fastify.config.AUTH_MODE || 'standalone',
         selfClient: { clientName: '<%= name.charAt(0).toUpperCase() + name.slice(1) %>' },
         origin: fastify.config.ORIGIN,
-        keyEncryptionSecret: fastify.config.OIDC_KEY_SECRET<% if (includeTenant) { %>,
+        keyEncryptionSecret: fastify.config.OIDC_KEY_SECRET,
+        legacyToken: false<% if (includeTenant) { %>,
         // 部署到应用中心时宿主注入 OIDC_APP_CODE 等；带本地租户数据，以 independent 模式托管宿主同步过来的租户
         tenant: () => fastify.tenant,
-        app: { tenantMode: 'independent' }<% } %>
+        app: { tenantMode: 'independent' }<% } %>,
+        // 未配置的项不传，避免 undefined 覆盖插件的环境变量默认值
+        ...(fastify.config.OIDC_CLIENT_ID ? { clientId: fastify.config.OIDC_CLIENT_ID } : {}),
+        ...(fastify.config.OIDC_AUDIENCE ? { audience: fastify.config.OIDC_AUDIENCE } : {}),
+        ...(fastify.config.OIDC_ISSUER ? { issuer: fastify.config.OIDC_ISSUER } : {}),
+        ...(fastify.config.OIDC_SERVICE_CLIENT_ID
+          ? {
+              serviceClient: {
+                clientId: fastify.config.OIDC_SERVICE_CLIENT_ID,
+                clientSecret: fastify.config.OIDC_SERVICE_CLIENT_SECRET
+              }
+            }
+          : {})
       });<% } %>
     })
   );

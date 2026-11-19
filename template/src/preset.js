@@ -12,45 +12,13 @@ import { getApis } from '@components/Apis';
 <% } %>
 window.PUBLIC_URL = window.runtimePublicUrl || process.env.PUBLIC_URL;
 
-const ensureBootMask = () => {
-  if (typeof document === 'undefined') {
-    return;
-  }
-  if (!document.getElementById('app-boot-style')) {
-    const style = document.createElement('style');
-    style.id = 'app-boot-style';
-    style.textContent =
-      '#app-boot{position:fixed;inset:0;z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#f6f7f9}#app-boot img{width:72px;height:72px;border-radius:22%;overflow:hidden}#app-boot-name{font-size:16px;line-height:24px;font-weight:500;color:rgba(0,0,0,.88)}';
-    document.head.appendChild(style);
-  }
-  let mask = document.getElementById('app-boot');
-  if (!mask) {
-    mask = document.createElement('div');
-    mask.id = 'app-boot';
-    const img = document.createElement('img');
-    img.id = 'app-boot-logo';
-    img.alt = '';
-    mask.appendChild(img);
-    document.body.prepend(mask);
-  }
-  let name = document.getElementById('app-boot-name');
-  if (!name) {
-    name = document.createElement('div');
-    name.id = 'app-boot-name';
-    mask.appendChild(name);
-  }
-  name.textContent = document.title;
-};
-
-ensureBootMask();
-
 const applyStaticUrls = appUrl => {
   document.querySelectorAll('link[rel="icon"], link[rel="apple-touch-icon"], link[rel="manifest"]').forEach(link => {
     link.setAttribute('href', appUrl.asset(link.getAttribute('href') || ''));
   });
   const logo = document.getElementById('app-boot-logo');
   if (logo) {
-    logo.setAttribute('src', appUrl.asset(logo.getAttribute('src') || '/favicon.svg'));
+    logo.setAttribute('src', appUrl.asset(logo.getAttribute('src') || '/favicon-192x192.png'));
   }
 };
 <% if (includeOidc) { %>
@@ -74,7 +42,7 @@ const globalInit = async () => {
   const componentsCoreRemote = {
     ...registry,
     remote: 'components-core',
-    defaultVersion: '0.6.15'
+    defaultVersion: '0.7.6'
   };
 
   remoteLoaderPreset({
@@ -84,22 +52,22 @@ const globalInit = async () => {
       'components-iconfont': {
         ...registry,
         remote: 'components-iconfont',
-        defaultVersion: '0.2.1'
+        defaultVersion: '0.3.0'
       },
       'components-file-manager': {
         ...registry,
         remote: 'components-file-manager',
-        defaultVersion: '0.1.9'
+        defaultVersion: '0.1.13'
       },
       'components-admin': {
         ...registry,
         remote: 'components-admin',
-        defaultVersion: '1.1.132'
+        defaultVersion: '1.1.151'
       },
       'components-thirdparty': {
         ...registry,
         remote: 'components-thirdparty',
-        defaultVersion: '0.1.55'
+        defaultVersion: '0.1.61'
       },
       'fastify-app':
         process.env.NODE_ENV === 'development'

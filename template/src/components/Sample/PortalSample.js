@@ -6,7 +6,7 @@ import getColumns from './getColumns';
 import FormInner from './FormInner';
 
 const PortalSample = createWithRemoteLoader({
-  modules: ['components-admin:BizUnit', 'components-core:Table@TablePage', 'components-core:Layout@Page']
+  modules: ['components-admin:BizUnit', 'components-core:TablePage', 'components-core:Layout@Page']
 })(
   withLocale(({ remoteModules, apis, layoutType = 'system-layout' }) => {
     const [BizUnit, TablePage, CorePage] = remoteModules;

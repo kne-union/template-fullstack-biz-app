@@ -3,6 +3,10 @@ import { globalInit } from './preset';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import installEmbedBridge from './commons/installEmbedBridge';
+
+// 应用中心主页 iframe：尽早挂钩 history，供父页前进/后退
+installEmbedBridge();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 const renderRoot = async App => {

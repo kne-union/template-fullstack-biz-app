@@ -8,8 +8,8 @@
 
 | 层 | 技术 |
 |---|---|
-| 前端框架 | React 18 + React Router 6 |
-| UI 组件库 | Ant Design 5 |
+| 前端框架 | React 19 + React Router 7 |
+| UI 组件库 | Ant Design 6 |
 | 样式方案 | Sass |
 | 构建工具 | Craco (Create React App 配置覆盖) |
 | 远程组件 | `@kne/remote-loader` |

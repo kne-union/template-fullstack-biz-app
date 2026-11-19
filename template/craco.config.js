@@ -13,6 +13,8 @@ module.exports = {
             return webpackConfig;
         }
     }, plugins: [{
-        plugin: CracoRemoteComponentsPlugin
+        plugin: CracoRemoteComponentsPlugin,
+        // React Compiler 由 @kne/modules-dev 内置（编译器与 runtime 均已随包安装），React 18/19 适用
+        options: {reactCompiler: true}
     }]
 };
