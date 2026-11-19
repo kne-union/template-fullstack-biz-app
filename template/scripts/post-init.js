@@ -35,6 +35,8 @@ const run = () => {
   if (!((includeTenantAdmin || includeTenantClient) && (includeDingtalk || includeWecom))) {
     removeDir(path.resolve(serverDir, 'libs/tasks'));
     removeDir(path.resolve(serverDir, 'libs/utils'));
+    // 测试依赖 libs/utils/office-hub，随之一并删除
+    removeDir(path.resolve(serverDir, 'test/office-hub.test.js'));
   }
 
   if (includeOidc === false) {

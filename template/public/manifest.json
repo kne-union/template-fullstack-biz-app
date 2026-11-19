@@ -1,24 +1,29 @@
 {
+  "id": ".",
   "short_name": "<%=name%>",
   "name": "<%=name%>",
+  "description": "<%=description%>",
+  "lang": "zh-CN",
   "icons": [
     {
-      "src": "favicon.svg",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "favicon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
     },
     {
-      "src": "favicon-192x192.png",
-      "type": "image/png",
-      "sizes": "192x192"
+      "src": "favicon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     },
     {
-      "src": "favicon-192x192.png",
+      "src": "maskable-512x512.png",
+      "sizes": "512x512",
       "type": "image/png",
-      "sizes": "512x512"
+      "purpose": "maskable"
     }
   ],
   "start_url": ".",
+  "scope": ".",
   "display": "standalone",
   "theme_color": "#4183F0",
   "background_color": "#ffffff"
