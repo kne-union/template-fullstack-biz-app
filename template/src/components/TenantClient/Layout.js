@@ -10,13 +10,12 @@ import { useIntl } from '@kne/react-intl';
 const Layout = createWithRemoteLoader({
   modules: [
     'components-admin:Tenant@Authenticate',
-    'components-core:Permissions',
     'components-core:Icon'<% if (tenantClientLayout === 'layout') { %>,
     'components-core:Layout'<% } %>
   ]
 })(
   withLocale(({ remoteModules, baseUrl, children }) => {
-    const [Authenticate, Permissions, Icon<% if (tenantClientLayout === 'layout') { %>, CoreLayout<% } %>] = remoteModules;
+    const [Authenticate, Icon<% if (tenantClientLayout === 'layout') { %>, CoreLayout<% } %>] = remoteModules;
     const { formatMessage } = useIntl();
 
     return (
@@ -24,44 +23,42 @@ const Layout = createWithRemoteLoader({
         {({ global }) => {
           const { tenantUserInfo, tenant } = global;
           return (
-            <Permissions request={['client']} type="error">
 <% if (tenantClientLayout === 'system-layout') { %>
-              <SystemLayout
-                openScrollbar={false}
-                logo={{ id: tenant?.logo }}
-                userInfo={{
-                  ...tenantUserInfo,
-                  email: '',
-                  description: tenantUserInfo?.options?.position || tenantUserInfo?.email
-                }}
-                background={'linear-gradient(180deg, #E8DCDF, #E1D1E3, #DED7EF, #D5E0F1)'}
-                menu={{
-                  base: baseUrl,
-                  items: [
-                    {
-                      path: '/',
-                      label: formatMessage({ id: 'ClientHome' }),
-                      toolbar: true,
-                      icon: <Icon type="a-home_fill" fontClassName="coach" />
-                    }
-                  ]
-                }}
-              >
-                {children || <Outlet />}
-              </SystemLayout>
+            <SystemLayout
+              openScrollbar={false}
+              logo={{ id: tenant?.logo }}
+              userInfo={{
+                ...tenantUserInfo,
+                email: '',
+                description: tenantUserInfo?.options?.position || tenantUserInfo?.email
+              }}
+              background={'linear-gradient(180deg, #E8DCDF, #E1D1E3, #DED7EF, #D5E0F1)'}
+              menu={{
+                base: baseUrl,
+                items: [
+                  {
+                    path: '/',
+                    label: formatMessage({ id: 'ClientHome' }),
+                    toolbar: true,
+                    icon: <Icon type="a-home_fill" fontClassName="coach" />
+                  }
+                ]
+              }}
+            >
+              {children || <Outlet />}
+            </SystemLayout>
 <% } else { %>
-              <CoreLayout
-                navigation={{
-                  base: baseUrl,
-                  showIndex: false,
-                  defaultTitle: formatMessage({ id: 'ClientHomeTitle' }),
-                  list: [{ key: 'home', title: formatMessage({ id: 'ClientHome' }), path: baseUrl }]
-                }}
-              >
-                {children || <Outlet />}
-              </CoreLayout>
+            <CoreLayout
+              navigation={{
+                base: baseUrl,
+                showIndex: false,
+                defaultTitle: formatMessage({ id: 'ClientHomeTitle' }),
+                list: [{ key: 'home', title: formatMessage({ id: 'ClientHome' }), path: baseUrl }]
+              }}
+            >
+              {children || <Outlet />}
+            </CoreLayout>
 <% } %>
-            </Permissions>
           );
         }}
       </Authenticate>

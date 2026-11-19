@@ -243,7 +243,9 @@ const globalInit = async () => {
     oidcMode: oidcConfig?.mode,<% } %>
     appUrl,
     staticUrl: baseApiUrl,
-    enums: Object.assign({}, await safeLoadApis('components-admin:Task@enums'), await safeLoadApis('components-admin:MessageManger@enums')),
+    enums: Object.assign({}, await safeLoadApis('components-admin:Task@enums'), await safeLoadApis('components-admin:MessageManger@enums'), {
+      taskType: () => []
+    }),
     apis: Object.assign(
       {},
       getAccountApis(),
