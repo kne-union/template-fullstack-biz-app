@@ -26,6 +26,7 @@
 - **全栈一体**：前端 React + 后端 Fastify 在同一仓库，开发部署统一管理
 - **企业级功能**：内置账户系统、多租户、RBAC 权限、文件管理、消息推送、第三方登录（钉钉/企业微信）、OSS 存储、任务调度
 - **开箱即用**：提供完整的 Sample CRUD 示例模块作为开发参考
+- **接入租户端左菜单**：`server/menus.json` 声明菜单（默认为空），`src/components/ComponentPreset` 提供被应用中心嵌入时的外层预设；菜单页面组件放在 `src/components/{Name}`，在 `menus.json` 中以 `component` 引用。租户可在设置里选择该应用在「左菜单」还是「应用中心」展示
 
 ## 快速开始
 
@@ -67,7 +68,7 @@ npm run build
 
 | 要求 | 模版中的处理 |
 |---|---|
-| 路径前缀 | `src/commons/publicUrl.js` 读取部署时注入的 `window.runtimePublicUrl`；`BrowserRouter` 以其作 `basename`，401 跳登录、切换租户等整页跳转用 `withPublicUrl` 补前缀；接口请求以 `window.runtimeApiUrl` 为 `baseURL` |
+| 路径前缀 | 统一使用 `components-admin:Oidc@appUrl`（preset 中加载并放入 `globalPreset.appUrl`）：`BrowserRouter` 的 `basename` 用 `appUrl.routerBasename()`，401 跳登录、切换租户等整页跳转用 `appUrl.page()`，favicon / manifest / 启动图用 `appUrl.asset()`，接口 `baseURL` 用 `appUrl.apiBase()`；不要在项目内再写 publicUrl 工具 |
 | 存储隔离 | `@kne/modules-dev ^2.4.17` 与 remote（components-admin ≥1.1.114、components-thirdparty ≥0.1.50）共享 `@kne/local-storage` 单例，登录 token 按注入的 `window.__LOCAL_STORAGE_PREFIX` 隔离 |
 | 共享库表前缀 | `@kne/fastify-sequelize ^4.0.5` 读取注入的 `DB_TABLE_PREFIX`（`t_{应用标识}_`）强制表名前缀 |
 | 数据库 | 支持 `DB_PORT`；生产用 `pg` 连接 postgres（mysql 需自行加 `mysql2`）。`sqlite3` 只在 devDependencies，供本地开发默认的 `DB_DIALECT=sqlite` 使用；App Manager 以 `npm install --production` 安装，不会装它，也就不会在服务器上编译原生模块 |
@@ -156,12 +157,19 @@ my-project/
 - 前端通过 `components-admin:Oidc` 走授权码 + PKCE 登录，请求自动带 `Authorization`
 - 独立部署时作为 IdP，提供 `/oidc` 协议端点与 `/oidc-interaction` 登录页
 - 部署在应用中心时以 central 模式运行，使用应用中心统一登录
+- 含租户端时以 independent 模式接入：宿主租户、成员、Logo 与头像同步到本地 fastify-tenant（托管租户只读），本地文件丢失时自动重新拷贝
 
 ### 多租户系统 (`@kne/fastify-tenant`)
 
 - 租户创建与管理
 - 组织架构管理
 - RBAC 角色权限
+- 应用系统权限写在 `server/libs/permissions.js`（经 `permissionsProfile` 合并进权限树）；部署到应用中心后注册给宿主，需在宿主为租户开通后才生效，租户管理员默认拥有已开通的全部权限
+
+### 接口文档
+
+- `@fastify/swagger` 在 server 最先注册，由 `@kne/fastify-app-runtime` 输出 `/open-api.json`；路由 schema 写 `tags`、`summary` 与字段 `description`
+- 写 `response` schema 时对象须保留 `additionalProperties: true`、可空字段类型带 `null`，否则序列化会丢字段或把 `null` 变成空串
 
 ### 任务调度 (`@kne/fastify-task`)
 
